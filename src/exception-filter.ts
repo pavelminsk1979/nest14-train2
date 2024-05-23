@@ -6,6 +6,12 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
+///////////////////////////////////////////////////////
+
+//ЭТО 1 вариант -базовый из документации
+
+////////////////////////////////////////////////
+
 /*https://docs.nestjs.com/exception-filters
 
   Exception filters
@@ -41,6 +47,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
 }*/
 
 /////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////
+
+//ЭТО 2 вариант  не сложный
+
+////////////////////////////////////////////////
+
 /*
 такой вариант обработки ошибки делает вывод такой
 в постмане
@@ -60,6 +73,56 @@ export class HttpExceptionFilter implements ExceptionFilter {
  текст каждой ошибки по каждому полю( тоесть может несколько ошибок
  для обного поля)
 */
+
+/*@Catch(HttpException)
+export class HttpExceptionFilter implements ExceptionFilter {
+  catch(exception: HttpException, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
+    const status = exception.getStatus();
+
+    if (status === 400) {
+      const errorResponse = {
+        errors: [],
+      };
+
+      const responseBody: any = exception.getResponse();
+
+      responseBody.message.forEach((m) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-expect-error
+        return errorResponse.errors.push({ message: m });
+      });
+
+      response.status(status).json(errorResponse);
+    } else {
+      response.status(status).json({
+        statusCode: status,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+        message: exception.message,
+      });
+    }
+  }
+}*/
+
+///////////////////////////////////////////////////////
+
+/*ЭТО 3 вариант  сложный
+ЗАДАЧА  ---вывести поле каждой
+ошибки(fuild:name)
+текст каждой ошибки по каждому полю
+message: textError
+( тоесть  может несколько ошибок  для одного поля быть,
+  мол что СТРОКА и что одязательно есть значение  )
+@IsString()
+@IsNotEmpty()*/
+
+/*изменения также  в  файле  main.ts
+ в строке     app.useGlobalPipes(new ValidationPipe());   */
+
+////////////////////////////////////////////////
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {

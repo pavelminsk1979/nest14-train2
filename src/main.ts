@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './exception-filter';
 
 /* вход в приложение
@@ -21,8 +21,22 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
 
-  /*ДЛЯ СОЗДАНИЯ ГЛОБАЛЬНОГО ПАЙПА */
-  app.useGlobalPipes(new ValidationPipe());
+  /*ДЛЯ СОЗДАНИЯ ГЛОБАЛЬНОГО ПАЙПА
+    КОД В АРГУМЕНТЕ --это чтоб если pipe валидация
+    не прошла то выводилась ошибка определенного
+    формата---поле конкретное и текст всех
+    ошибок для этого поля*/
+  app.useGlobalPipes(
+    new ValidationPipe({
+      exceptionFactory: (errors) => {
+        const errorForResponse: any = [];
+        errors.forEach((e) => {
+          errorForResponse.push({ field: e.property });
+        });
+        throw new BadRequestException(errorForResponse);
+      },
+    }),
+  );
 
   /*https://docs.nestjs.com/exception-filters
 
@@ -41,3 +55,23 @@ async function bootstrap() {
 }
 
 bootstrap();
+
+/*
+new ValidationPipe({
+  stopAtFirstError: false,
+  exceptionFactory: (errors) => {
+    const errorsForResponse = [];
+
+    errors.forEach((e) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      const zeroKey = Object.keys(e.constraints[0]);
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      errorsForResponse.push(e.constraints[zeroKey]);
+    });
+
+    throw new BadRequestException(errorsForResponse);
+  },
+}),*/
