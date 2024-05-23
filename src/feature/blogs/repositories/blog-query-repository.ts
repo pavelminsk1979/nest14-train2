@@ -3,8 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Blog, BlogDocument } from '../domains/domain-blog';
 import { BlogViewDto } from '../dto/create-blog-view-dto';
-import { BlogQueryParams } from '../types/models';
-import { ViewArrayBlog, ViewBlog } from '../types/views';
+import { BlogQueryParams } from '../api/types/models';
+import { ViewArrayBlog, ViewBlog } from '../api/types/views';
 
 @Injectable()
 export class BlogQueryRepository {

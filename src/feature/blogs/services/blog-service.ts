@@ -5,13 +5,13 @@ import { Blog, BlogDocument } from '../domains/domain-blog';
 import { CreateBlogDto } from '../dto/create-blog-dto';
 import { BlogRepository } from '../repositories/blog-repository';
 import {
-  CreateBlogInputModel,
   CreatePostForBlogInputModel,
   UpdateBlogInputModel,
-} from '../types/models';
+} from '../api/types/models';
 import { Post, PostDocument } from '../../posts/domains/domain-post';
 import { CreatePostDto } from '../../posts/dto/create-post-dto';
 import { PostRepository } from '../../posts/repositories/post-repository';
+import { CreateBlogInputModel } from '../api/pipes/CreateBlogInputModel';
 
 @Injectable()
 export class BlogService {

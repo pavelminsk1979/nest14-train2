@@ -12,11 +12,18 @@ import { Request, Response } from 'express';
 
 ---ЭТО ПЕРЕХВАТ ЛЮБОГО HTTP кода ошибки
 
---НАДО ГЛОБАЛЬНО ПОДКЛЮЧИТЬ К ПРИЛОЖЕНИЮ*/
+--НАДО ГЛОБАЛЬНО ПОДКЛЮЧИТЬ К ПРИЛОЖЕНИЮ
+ app.useGlobalFilters(new HttpExceptionFilter());
+в main.ts
+
+*/
 
 /*
 ЭТО БАЗОВЫЙ КОД ИЗ ДОКУМЕНТАЦИИ --ниже я его
-как по уроку изменил
+ изменил согласно  --как по уроку
+ ибо была задача выводить определенную
+ информацию о данной ошибке
+
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
@@ -32,6 +39,27 @@ export class HttpExceptionFilter implements ExceptionFilter {
     });
   }
 }*/
+
+/////////////////////////////////////////////////////
+/*
+такой вариант обработки ошибки делает вывод такой
+в постмане
+
+{
+  "errors": [
+  {
+    "message": "Short length поля name"
+  },
+  {
+    "message": "description must be an integer number"
+  }
+]
+}
+НО ЗАДАЧА МОЖЕТ БЫТЬ СЛОЖНЕЕ ---вывести поле каждой
+ошибки(fuild:name)
+ текст каждой ошибки по каждому полю( тоесть может несколько ошибок
+ для обного поля)
+*/
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -60,16 +88,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
         statusCode: status,
         timestamp: new Date().toISOString(),
         path: request.url,
+        message: exception.message,
       });
     }
   }
 }
-
-/*
-ВОТ ТОЛЬКО ТАКИМ КОДОМ ПОСТМАН ВЫВЕЛ ТАКУЮ ОШИБКУ
-{
-  "errors": [
-  "name must be longer than or equal to 10 characters",
-  "description must be longer than or equal to 10 characters"
-]
-}*/

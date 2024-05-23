@@ -1,8 +1,8 @@
-export type CreateBlogInputModel = {
+/*export type CreateBlogInputModel = {
   name: string;
   description: string;
   websiteUrl: string;
-};
+};*/
 
 type SortDirection = 'asc' | 'desc';
 
