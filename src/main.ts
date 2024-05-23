@@ -31,7 +31,18 @@ async function bootstrap() {
       exceptionFactory: (errors) => {
         const errorForResponse: any = [];
         errors.forEach((e) => {
-          errorForResponse.push({ field: e.property });
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+          const constraintsKey = Object.keys(e.constraints);
+
+          constraintsKey.forEach((ckey) => {
+            errorForResponse.push({
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-expect-error
+              message: e.constraints[ckey],
+              field: e.property,
+            });
+          });
         });
         throw new BadRequestException(errorForResponse);
       },
@@ -55,6 +66,17 @@ async function bootstrap() {
 }
 
 bootstrap();
+
+/*рабочий 
+new ValidationPipe({
+  exceptionFactory: (errors) => {
+    const errorForResponse: any = [];
+    errors.forEach((e) => {
+      errorForResponse.push({ field: e.property });
+    });
+    throw new BadRequestException(errorForResponse);
+  },
+}),*/
 
 /*
 new ValidationPipe({

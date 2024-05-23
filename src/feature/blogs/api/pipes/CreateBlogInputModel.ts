@@ -70,10 +70,11 @@ name с малым количеством символов то будет ош�
 
 */
 
-import { IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class CreateBlogInputModel {
   /* ТАК СВОЙ ТЕКСТ ОШИБКИ МОЖНО ПРОПИСАТЬ*/
+  @IsEmail()
   @Length(10, 20, { message: 'Short length поля name' })
   name: string;
   @IsString()

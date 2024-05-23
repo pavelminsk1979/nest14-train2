@@ -108,19 +108,69 @@ export class HttpExceptionFilter implements ExceptionFilter {
 }*/
 
 ///////////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 
 /*ЭТО 3 вариант  сложный
 ЗАДАЧА  ---вывести поле каждой
 ошибки(fuild:name)
 текст каждой ошибки по каждому полю
 message: textError
-( тоесть  может несколько ошибок  для одного поля быть,
-  мол что СТРОКА и что одязательно есть значение  )
-@IsString()
-@IsNotEmpty()*/
+
+
+
+
+----ВОТ ТАКОЙ ВЫВОД ОШИБКИ БУДЕТ
+{
+    "errors": [
+        {
+            "message": "Short length поля name",
+            "field": "name"
+        },
+        {
+            "message": "name must be an email",
+            "field": "name"
+        },
+        {
+            "message": "description should not be empty",
+            "field": "description"
+        }
+    ]
+}
+------я специально сделал две ошибки для поля name
+  @IsEmail()
+  @Length(10, 20, { message: 'Short length поля name' })
+  name: string;
+
+
+*/
 
 /*изменения также  в  файле  main.ts
- в строке     app.useGlobalPipes(new ValidationPipe());   */
+ в строке     app.useGlobalPipes(new ValidationPipe()); 
+   
+  --- ВОТ ТАКОЙ ТАМ КОД 
+     app.useGlobalPipes(
+    new ValidationPipe({
+      exceptionFactory: (errors) => {
+        const errorForResponse: any = [];
+        errors.forEach((e) => {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+          const constraintsKey = Object.keys(e.constraints);
+
+          constraintsKey.forEach((ckey) => {
+            errorForResponse.push({
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-expect-error
+              message: e.constraints[ckey],
+              field: e.property,
+            });
+          });
+        });
+        throw new BadRequestException(errorForResponse);
+      },
+    }),
+  );*/
 
 ////////////////////////////////////////////////
 
@@ -142,7 +192,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       responseBody.message.forEach((m) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         //@ts-expect-error
-        return errorResponse.errors.push({ message: m });
+        return errorResponse.errors.push(m);
       });
 
       response.status(status).json(errorResponse);
