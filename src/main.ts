@@ -1,7 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { HttpExceptionFilter } from './exception-filter';
+import {
+  BadRequestException,
+  ValidationError,
+  ValidationPipe,
+} from '@nestjs/common';
+import { ErrorResponseType, HttpExceptionFilter } from './exception-filter';
 
 /* вход в приложение
 тут происходит настройка и запуск приложения
@@ -29,17 +33,15 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       exceptionFactory: (errors) => {
-        const errorForResponse: any = [];
-        errors.forEach((e) => {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-expect-error
-          const constraintsKey = Object.keys(e.constraints);
+        const errorForResponse: ErrorResponseType[] = [];
+        errors.forEach((e: ValidationError) => {
+          const constraintsKey = Object.keys(e.constraints ?? {});
+          /*constraints это {isEmail: 'name must be an email', isLength: 'Short length поля name'}
+           * --и создаётся массив ключей[isEmail,isLength]*/
 
-          constraintsKey.forEach((ckey) => {
+          constraintsKey.forEach((ckey: string) => {
             errorForResponse.push({
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-expect-error
-              message: e.constraints[ckey],
+              message: e.constraints?.[ckey] ?? 'default message',
               field: e.property,
             });
           });

@@ -173,6 +173,10 @@ message: textError
   );*/
 
 ////////////////////////////////////////////////
+export type ErrorResponseType = {
+  message: string;
+  field: string;
+};
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -183,15 +187,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
 
     if (status === 400) {
-      const errorResponse = {
+      const errorResponse: { errors: ErrorResponseType[] } = {
         errors: [],
       };
 
       const responseBody: any = exception.getResponse();
 
       responseBody.message.forEach((m) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //@ts-expect-error
         return errorResponse.errors.push(m);
       });
 
